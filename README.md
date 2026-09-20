@@ -2,7 +2,7 @@ English | [简体中文](README.zh-CN.md)
 
 # Retro Codex Pets
 
-Four hand-drawn pixel-art pets for the Codex CLI: two androids from *The Ninja Warriors* and two of X's armors from *Mega Man X4*. Every pet is a complete V2 package — idle, running both ways, waving, jumping, failing, waiting, working, reviewing, and all sixteen gaze poses — so it reacts to what the agent is doing instead of just standing there.
+Four pixel-art pets for the Codex CLI, built from the original console sprite art of the games they depict: two androids from *The Ninja Warriors* and two of X's armors from *Mega Man X4*. Every pet is a complete V2 package — idle, running both ways, waving, jumping, failing, waiting, working, reviewing, and all sixteen gaze poses — so it reacts to what the agent is doing instead of just standing there.
 
 Each preview below is the real pet, animated with the per-frame timings from the table further down.
 
@@ -112,10 +112,19 @@ python3 tools/make_previews.py --scale 3 --background paper
 
 The generator reads each package's own manifest and spritesheet, plays the tracks with the durations above, and composites a 2x nearest-neighbour card on a checkerboard so the transparency is visible. Options: `--pets-dir`, `--out-dir`, `--pets`, `--scale`, `--background {checker,paper,ink}`.
 
-## Credits
+## Credits and rights
 
-The sprites are fan art, drawn by hand for these pets. *The Ninja Warriors* and its androids are Taito's; *Mega Man X4*, X, and the Fourth and Ultimate Armors are Capcom's. Nothing here is official, endorsed, or licensed by either company, and the art is shared for personal, non-commercial use.
+The sprite art in these pets comes from the original console sprite art of the games they depict: *The Ninja Warriors* (Taito) and *Mega Man X4* (Capcom). The characters, the designs, the original sprites, and the names belong to their owners. No original artwork is claimed here, and no ownership of any of it is asserted.
+
+This is a personal, non-commercial fan project:
+
+- **No profit of any kind.** Nothing here is sold, licensed, sponsored, or monetized — no ads, no paid tiers, no donations, no affiliate links, no revenue.
+- **No affiliation.** This is not authorized by, endorsed by, or connected to Taito, Capcom, or OpenAI.
+- **Non-commercial use only.** The packages are published so that other people can use the same pets with their own Codex install. They are not licensed for commercial use or for inclusion in anything sold.
+- **Removal on request.** If you hold the rights to this material and want it taken down, open an issue and it will be removed.
+
+The games themselves are published and re-released by their rights holders, and that is the only place these characters are officially available.
 
 ## License
 
-The scripts and manifests are MIT — see [LICENSE](LICENSE). The character designs belong to their owners, as noted above.
+The scripts and manifests are MIT — see [LICENSE](LICENSE). That grant covers the code in this repository, not the artwork; the characters and the sprites they are built from belong to their owners, as set out above.

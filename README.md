@@ -54,7 +54,8 @@ git clone https://github.com/dncore/retro-codex-pets && cd retro-codex-pets && .
 `CODEX_HOME` picks the Codex data directory, and `PET_REF` picks a branch or tag to download from:
 
 ```sh
-CODEX_HOME=/tmp/codex-test PET_REF=v1.0.0 ./install.sh
+CODEX_HOME=/tmp/codex-test ./install.sh      # install somewhere else
+PET_REF=some-branch ./install.sh             # or: a branch, or a tag
 ```
 
 The installer downloads into a staging directory and swaps it into place only once both files have arrived, so a dropped connection cannot leave you with half a pet. To remove one:

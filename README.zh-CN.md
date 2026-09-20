@@ -54,7 +54,8 @@ git clone https://github.com/dncore/retro-codex-pets && cd retro-codex-pets && .
 `CODEX_HOME` 指定 Codex 数据目录，`PET_REF` 指定从哪个分支或 tag 下载：
 
 ```sh
-CODEX_HOME=/tmp/codex-test PET_REF=v1.0.0 ./install.sh
+CODEX_HOME=/tmp/codex-test ./install.sh      # 装到别处
+PET_REF=some-branch ./install.sh             # 指定分支，或 tag
 ```
 
 安装脚本先下载到暂存目录，两个文件都到齐后才替换进去，所以网络中断不会给你留下半个宠物。卸载：

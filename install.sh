@@ -29,10 +29,18 @@ Available pets: ${KNOWN[*]}
 EOF
 }
 
-# A checkout next to this script wins over the network.
-SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || pwd)"
-if [ -d "$SELF_DIR/pets" ]; then
-  SOURCE="local $SELF_DIR/pets"
+# A checkout next to this script wins over the network, but only when the
+# script arrived as a file. Piped in through curl, BASH_SOURCE is unset and the
+# working directory belongs to the caller, which is not a source for anything.
+SELF="${BASH_SOURCE[0]:-}"
+SELF_DIR=""
+if [ -n "$SELF" ] && [ -f "$SELF" ]; then
+  SELF_DIR="$(cd "$(dirname "$SELF")" && pwd)"
+fi
+LOCAL_PETS=""
+if [ -n "$SELF_DIR" ] && [ -d "$SELF_DIR/pets" ]; then
+  LOCAL_PETS="$SELF_DIR/pets"
+  SOURCE="local $LOCAL_PETS"
 else
   SOURCE="remote $RAW"
 fi
@@ -68,14 +76,20 @@ done
 echo "Installing ${#wanted[@]} pet(s) into $PETS_DIR  (from $SOURCE)"
 mkdir -p "$PETS_DIR"
 
+staging=""
+cleanup() {
+  if [ -n "$staging" ]; then rm -rf "$staging"; fi
+}
+trap cleanup EXIT
+
 for id in "${wanted[@]}"; do
   dest="$PETS_DIR/$id"
-  staging="$dest.staging.$$"
-  rm -rf "$staging"
-  mkdir -p "$staging"
+  # Staged outside the pets directory: an abandoned half-package in there
+  # would be picked up as a pet.
+  staging="$(mktemp -d "${TMPDIR:-/tmp}/retro-codex-pets.XXXXXX")"
 
-  if [ -d "$SELF_DIR/pets" ]; then
-    cp "$SELF_DIR/pets/$id/pet.json" "$SELF_DIR/pets/$id/spritesheet.webp" "$staging/"
+  if [ -n "$LOCAL_PETS" ]; then
+    cp "$LOCAL_PETS/$id/pet.json" "$LOCAL_PETS/$id/spritesheet.webp" "$staging/"
   else
     curl -fsSL "$RAW/pets/$id/pet.json" -o "$staging/pet.json"
     curl -fsSL "$RAW/pets/$id/spritesheet.webp" -o "$staging/spritesheet.webp"
@@ -86,6 +100,7 @@ for id in "${wanted[@]}"; do
   [ -d "$dest" ] && was="replaced" || was="installed"
   rm -rf "$dest"
   mv "$staging" "$dest"
+  staging=""
   echo "  $was $id"
 done
 

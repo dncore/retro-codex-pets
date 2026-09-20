@@ -97,7 +97,7 @@ The spritesheets are `1536x2288` WebP, losslessly encoded, 28-40 KB each — sma
 
 A few details that matter if you draw your own:
 
-- **Row 0 columns 6 and 7 are not part of the idle loop.** Per the skill below, column 6 holds the front-facing neutral gaze pose that the look algorithm recentres to, and column 7 must be transparent; these four pets populate column 6 and leave column 7 empty. agent-pet-runtime's validator counts both columns as surplus — content in either draws a warning rather than an error, and nothing there can reach playback.
+- **Row 0 column 6 is required; column 7 must be empty.** A V2 idle row plays columns 0-5, the neutral slot in column 6 must be populated — Codex's own validator fails an atlas whose column 6 is empty, with `idle row 0 column 6 is empty or too sparse` — and column 7 must be fully transparent, on pain of `idle row 0 unused column 7 is not transparent`. All four pets here satisfy both and pass `validate_atlas.py --require-v2` with no errors and no warnings. Column 6 is the neutral/default slot the gaze assembly measures against; a pointer with no direction falls back to idle rather than to that cell.
 - **The gaze rows are poses, not an animation.** Codex picks one by pointer angle, which is why the preview sweeps through all sixteen for you.
 - **The idle timings are the authored ones.** Codex's own table multiplies those six durations by six and stretches the breath into something very slow; the preview GIFs use the authored timings.
 - **Waving, jumping, failed and review are moments.** They play their row a few times and then settle back into idle. Waiting and the two running rows are conditions, and loop for as long as the condition holds.

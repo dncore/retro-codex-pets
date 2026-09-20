@@ -112,6 +112,8 @@ python3 tools/make_previews.py --scale 3 --background paper
 
 生成脚本读取每个宠物包自己的清单和精灵图，按上表时长播放，并在棋盘格上以 2 倍最近邻放大合成卡片，方便看清透明区域。可用参数：`--pets-dir`、`--out-dir`、`--pets`、`--scale`、`--background {checker,paper,ink}`。
 
+每个预览都会在 GIF 注释里记录它依据的图集 SHA-256，CI 会拿它和实际随包发布的图集比对。预览落后于精灵图时会直接检查失败，而不会被发布出去。
+
 ## 版权与致谢
 
 本项目的精灵图取自其描绘的游戏原版 sprite：《The Ninja Warriors》（Taito）与《Mega Man X4》（Capcom）。角色、设定、原始 sprite 与名称均归各自所有者所有。本项目不主张任何原创美术，也不主张对上述内容的任何所有权。

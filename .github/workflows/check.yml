@@ -38,3 +38,21 @@ jobs:
               bad += not ok
           sys.exit(f"{bad} package(s) failed validation" if bad else 0)
           PY
+      - name: Previews match the atlases they ship with
+        run: |
+          python3 - <<'PY'
+          import glob, hashlib, json, pathlib, sys
+          from PIL import Image
+          bad = []
+          for gif in sorted(glob.glob("previews/*.gif")):
+              pet = pathlib.Path(gif).stem
+              manifest = json.loads(pathlib.Path(f"pets/{pet}/pet.json").read_text())
+              atlas = pathlib.Path(f"pets/{pet}") / manifest.get("spritesheetPath", "spritesheet.webp")
+              im = Image.open(gif); im.load()
+              note = im.info.get("comment", b"").decode("ascii", "replace")
+              want = "atlas-sha256:" + hashlib.sha256(atlas.read_bytes()).hexdigest()
+              ok = note == want
+              print(f"{gif:<32} {'matches its atlas' if ok else 'STALE: ' + (note or 'no note')}")
+              if not ok: bad.append(gif)
+          sys.exit(f"stale previews: {bad}" if bad else 0)
+          PY

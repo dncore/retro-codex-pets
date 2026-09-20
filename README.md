@@ -112,6 +112,8 @@ python3 tools/make_previews.py --scale 3 --background paper
 
 The generator reads each package's own manifest and spritesheet, plays the tracks with the durations above, and composites a 2x nearest-neighbour card on a checkerboard so the transparency is visible. Options: `--pets-dir`, `--out-dir`, `--pets`, `--scale`, `--background {checker,paper,ink}`.
 
+Every preview records the SHA-256 of the atlas it was built from in a GIF comment, and CI compares that against the atlas actually shipping. A preview that has fallen behind its spritesheet fails the check instead of being published.
+
 ## Credits and rights
 
 The sprite art in these pets comes from the original console sprite art of the games they depict: *The Ninja Warriors* (Taito) and *Mega Man X4* (Capcom). The characters, the designs, the original sprites, and the names belong to their owners. No original artwork is claimed here, and no ownership of any of it is asserted.

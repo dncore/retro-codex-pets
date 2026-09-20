@@ -9,6 +9,7 @@ loop, and the sixteen gaze poses are shown as a sweep.
 """
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -161,13 +162,18 @@ def main():
 
     for pet_id in ids:
         manifest = json.loads((args.pets_dir / pet_id / "pet.json").read_text())
-        sheet = Image.open(args.pets_dir / pet_id / manifest.get("spritesheetPath", "spritesheet.webp")).convert("RGBA")
+        sheet_path = args.pets_dir / pet_id / manifest.get("spritesheetPath", "spritesheet.webp")
+        sheet = Image.open(sheet_path).convert("RGBA")
         frames, durations = build_frames(sheet, manifest.get("displayName", pet_id), args.scale, args.background, fonts)
         out = args.out_dir / f"{pet_id}.gif"
+        # The GIF comment names the atlas this preview was built from. It is a
+        # comment rather than a manifest field so it stays invisible where the
+        # preview is shown, and CI compares it against the shipping atlas.
+        note = b"atlas-sha256:" + hashlib.sha256(sheet_path.read_bytes()).hexdigest().encode()
         palette_frames = to_gif_palette(frames)
         palette_frames[0].save(
             out, save_all=True, append_images=palette_frames[1:],
-            duration=durations, loop=0, optimize=True,
+            duration=durations, loop=0, optimize=True, comment=note,
         )
         total = sum(durations) / 1000
         print(f"{out}  {len(frames)} frames, {total:.1f}s, {out.stat().st_size // 1024} KB")

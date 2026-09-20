@@ -84,7 +84,7 @@ The spritesheets are `1536x2288` WebP, losslessly encoded, 28-40 KB each — sma
 
 | Row | Track | Frames | Per-frame duration | What it means |
 |----:|-------|-------:|--------------------|---------------|
-| 0 | idle | 6 | 280, 110, 110, 140, 140, 320 ms | resting breath |
+| 0 | idle | 6 (+1 gaze) | 280, 110, 110, 140, 140, 320 ms | resting breath |
 | 1 | running-right | 8 | 120 ms, last frame 220 ms | travelling right |
 | 2 | running-left | 8 | 120 ms, last frame 220 ms | travelling left |
 | 3 | waving | 4 | 140 ms, last frame 280 ms | hello |
@@ -97,7 +97,7 @@ The spritesheets are `1536x2288` WebP, losslessly encoded, 28-40 KB each — sma
 
 A few details that matter if you draw your own:
 
-- **Cells a row does not use are never played.** Leftover art in them is harmless; the validator in [agent-pet-runtime](https://github.com/dncore/agent-pet-runtime) reports it as a warning, not an error. All four pets here carry one such cell, row 0 column 6 — a spare idle frame that nothing can reach.
+- **Row 0 columns 6 and 7 are not part of the idle loop.** Per the skill below, column 6 holds the front-facing neutral gaze pose that the look algorithm recentres to, and column 7 must be transparent; these four pets populate column 6 and leave column 7 empty. agent-pet-runtime's validator counts both columns as surplus — content in either draws a warning rather than an error, and nothing there can reach playback.
 - **The gaze rows are poses, not an animation.** Codex picks one by pointer angle, which is why the preview sweeps through all sixteen for you.
 - **The idle timings are the authored ones.** Codex's own table multiplies those six durations by six and stretches the breath into something very slow; the preview GIFs use the authored timings.
 - **Waving, jumping, failed and review are moments.** They play their row a few times and then settle back into idle. Waiting and the two running rows are conditions, and loop for as long as the condition holds.
@@ -113,6 +113,21 @@ python3 tools/make_previews.py --scale 3 --background paper
 The generator reads each package's own manifest and spritesheet, plays the tracks with the durations above, and composites a 2x nearest-neighbour card on a checkerboard so the transparency is visible. Options: `--pets-dir`, `--out-dir`, `--pets`, `--scale`, `--background {checker,paper,ink}`.
 
 Every preview records the SHA-256 of the atlas it was built from in a GIF comment, and CI compares that against the atlas actually shipping. A preview that has fallen behind its spritesheet fails the check instead of being published.
+
+## Making your own from other sprites
+
+[`skills/sprite-to-codex-pet/`](skills/sprite-to-codex-pet/) is the agent skill these pets were built with, published here alongside them. Feed it a sprite sheet from a console game, a MUGEN pack, or your own pixel art, and it walks an agent through the whole job: chroma-keying the background without eating the character's own colours, cutting the frames out of the original art, scaling by whole-number nearest neighbour, anchoring every frame so the pet stops jittering, choosing which original frames are the wave and which are the failure, compositing the poses the original art does not have, and assembling the atlas.
+
+It ships with a spec of the v2 atlas, sixteen documented pitfalls with their fixes, and four scripts — an atlas doctor, a chroma cleaner, a quick checker, and a loop-preview generator:
+
+```sh
+git clone https://github.com/dncore/retro-codex-pets /tmp/rp
+cp -R /tmp/rp/skills/sprite-to-codex-pet ~/.claude/skills/     # or ~/.gemini/config/skills/
+python3 -m pip install pillow numpy
+python3 ~/.claude/skills/sprite-to-codex-pet/scripts/pet_doctor.py path/to/spritesheet.webp
+```
+
+See the [skill's README](skills/sprite-to-codex-pet/README.md) for what each script does and the one place its drift metric can mislead you.
 
 ## Credits and rights
 

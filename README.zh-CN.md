@@ -84,7 +84,7 @@ rm -rf "${CODEX_HOME:-$HOME/.codex}/pets/nw-ninja"
 
 | 行 | 轨道 | 帧数 | 逐帧时长 | 含义 |
 |----:|-------|-------:|--------------------|---------------|
-| 0 | idle | 6 | 280, 110, 110, 140, 140, 320 ms | 待机呼吸 |
+| 0 | idle | 6 (+1 注视) | 280, 110, 110, 140, 140, 320 ms | 待机呼吸 |
 | 1 | running-right | 8 | 120 ms，末帧 220 ms | 向右移动 |
 | 2 | running-left | 8 | 120 ms，末帧 220 ms | 向左移动 |
 | 3 | waving | 4 | 140 ms，末帧 280 ms | 打招呼 |
@@ -97,7 +97,7 @@ rm -rf "${CODEX_HOME:-$HOME/.codex}/pets/nw-ninja"
 
 自己画宠物时需要注意的几点：
 
-- **某一行用不到的单元格永远不会播放。** 里面残留的图案无害；[agent-pet-runtime](https://github.com/dncore/agent-pet-runtime) 的校验器只会给出警告，不会报错。这里四个宠物都有一格这样的残留——第 0 行第 6 列，一个取不到的备用待机帧。
+- **第 0 行的第 6、7 列不属于待机循环。** 按下方 skill 的说法，第 6 列存放正面注视中立姿态（供光标注视算法回正使用），第 7 列必须完全透明；这四个宠物都填了第 6 列、留空第 7 列。而 agent-pet-runtime 的校验器把这两列都算作富余列——里面有内容只给警告、不报错，而且那里的像素不会进入播放。
 - **注视行是姿态，不是动画。** Codex 根据指针角度挑一格，所以预览里替你把十六格扫了一遍。
 - **待机用的是原始时长。** Codex 自己的表把这六个时长整体乘以六，把一次呼吸拉得极慢；预览 GIF 用的是原始时长。
 - **挥手、跳跃、失败、检视是一次性的“瞬间”。** 它们把整行播几遍，然后回到待机。等待和两个奔跑行是“状态”，只要状态还在就一直循环。
@@ -113,6 +113,21 @@ python3 tools/make_previews.py --scale 3 --background paper
 生成脚本读取每个宠物包自己的清单和精灵图，按上表时长播放，并在棋盘格上以 2 倍最近邻放大合成卡片，方便看清透明区域。可用参数：`--pets-dir`、`--out-dir`、`--pets`、`--scale`、`--background {checker,paper,ink}`。
 
 每个预览都会在 GIF 注释里记录它依据的图集 SHA-256，CI 会拿它和实际随包发布的图集比对。预览落后于精灵图时会直接检查失败，而不会被发布出去。
+
+## 用别的 sprite 做自己的宠物
+
+[`skills/sprite-to-codex-pet/`](skills/sprite-to-codex-pet/) 就是制作这些宠物所用的 agent skill，与宠物一起开源在这里。把游戏机原版 sprite、MUGEN 图包或你自己的像素画交给它，它会带 agent 走完整个流程：抠背景时不误伤角色自身的配色、从原图切出帧、整数倍最近邻缩放、逐帧解剖学锚定（消除抖动）、判断原图里哪几帧是招手哪几帧是失败、合成原图没有的姿态、最后装配图集。
+
+随附 v2 图集规范、16 条踩坑经验与解决方案，以及四个脚本——图集体检、去底清洗、快速校验、循环预览生成：
+
+```sh
+git clone https://github.com/dncore/retro-codex-pets /tmp/rp
+cp -R /tmp/rp/skills/sprite-to-codex-pet ~/.claude/skills/     # 或 ~/.gemini/config/skills/
+python3 -m pip install pillow numpy
+python3 ~/.claude/skills/sprite-to-codex-pet/scripts/pet_doctor.py path/to/spritesheet.webp
+```
+
+各脚本的用途、以及它的抖动指标唯一会误导你的地方，见 [skill 的 README](skills/sprite-to-codex-pet/README.md)。
 
 ## 版权与致谢
 

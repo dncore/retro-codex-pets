@@ -1,0 +1,40 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sanitize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for home paths and credentials
+        run: bash scripts/sanitize-check.sh
+
+  packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install --quiet pillow
+      - name: Validate every pet package
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, sys
+          from PIL import Image
+          bad = 0
+          for pkg in sorted(pathlib.Path("pets").iterdir()):
+              manifest = json.loads((pkg / "pet.json").read_text())
+              sheet = Image.open(pkg / manifest["spritesheetPath"])
+              ok = (
+                  manifest.get("id") == pkg.name
+                  and sheet.size == (1536, 2288)
+                  and sheet.mode == "RGBA"
+              )
+              print(f"{pkg.name:<20} {sheet.size} {sheet.mode} id={manifest.get('id')} {'ok' if ok else 'BAD'}")
+              bad += not ok
+          sys.exit(f"{bad} package(s) failed validation" if bad else 0)
+          PY

@@ -1,0 +1,120 @@
+[English](README.md) | 简体中文
+
+# Retro Codex Pets
+
+四个手绘像素风的 Codex 宠物：两位来自《The Ninja Warriors》的忍者机器人，以及《Mega Man X4》中 X 的两套装甲。每个都是完整的 V2 宠物包——待机、左右奔跑、挥手、跳跃、失败、等待、工作、检视，外加全部十六个注视方向——它会跟着 agent 的进度做反应，而不只是傻站着。
+
+下面的预览就是宠物本身，逐帧时长与下方的表格一致。
+
+## Kunoichi
+
+![Kunoichi：待机、向右奔跑、向左奔跑、挥手、跳跃、等待、失败、工作、检视、注视扫描](previews/nw-kunoichi.gif)
+
+绯红装甲的女忍者机器人，双持苦无。`nw-kunoichi` —— 《The Ninja Warriors》
+
+## Ninja
+
+![Ninja：待机、向右奔跑、向左奔跑、挥手、跳跃、等待、失败、工作、检视、注视扫描](previews/nw-ninja.gif)
+
+重型钢铁机器人，前臂伸缩刀刃。`nw-ninja` —— 《The Ninja Warriors》
+
+## X (Fourth Armor)
+
+![X 第四装甲：待机、向右奔跑、向左奔跑、挥手、跳跃、等待、失败、工作、检视、注视扫描](previews/x4-fourth-armor.gif)
+
+白金配色的空气动力装甲，等离子炮与悬浮靴。`x4-fourth-armor` —— 《Mega Man X4》
+
+## X (Ultimate Armor)
+
+![X 究极装甲：待机、向右奔跑、向左奔跑、挥手、跳跃、等待、失败、工作、检视、注视扫描](previews/x4-ultimate-armor.gif)
+
+紫罗兰装甲，金色羽翼头冠，究极冲击。`x4-ultimate-armor` —— 《Mega Man X4》
+
+## 安装
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/dncore/retro-codex-pets/main/install.sh | bash
+```
+
+这条命令会把四个宠物全部装进 `$CODEX_HOME/pets`（默认为 `~/.codex/pets`）。然后在 Codex 里打开 **Settings -> Appearance -> Pets** 选中你的宠物，输入 `/pet` 让它出场。
+
+只装其中几个，或从本地仓库安装：
+
+```sh
+# 只装指定宠物
+curl -fsSL https://raw.githubusercontent.com/dncore/retro-codex-pets/main/install.sh | bash -s nw-kunoichi x4-ultimate-armor
+
+# 列出可用 id，或查看全部选项
+curl -fsSL https://raw.githubusercontent.com/dncore/retro-codex-pets/main/install.sh | bash -s -- --list
+
+# 从 clone 出来的仓库安装：直接复制本地文件，不下载
+git clone https://github.com/dncore/retro-codex-pets && cd retro-codex-pets && ./install.sh
+```
+
+`CODEX_HOME` 指定 Codex 数据目录，`PET_REF` 指定从哪个分支或 tag 下载：
+
+```sh
+CODEX_HOME=/tmp/codex-test PET_REF=v1.0.0 ./install.sh
+```
+
+安装脚本先下载到暂存目录，两个文件都到齐后才替换进去，所以网络中断不会给你留下半个宠物。卸载：
+
+```sh
+rm -rf "${CODEX_HOME:-$HOME/.codex}/pets/nw-ninja"
+```
+
+手动安装则是每个宠物两个文件：把 `pets/<id>/pet.json` 和 `pets/<id>/spritesheet.webp` 复制到 `~/.codex/pets/<id>/` 即可。
+
+## 宠物包里有什么
+
+宠物包是以 id 命名的目录，里面有一个 `pet.json` 清单和一张精灵图。这里四个宠物都是 **精灵版本 2**（V2），也就是引入了注视姿态的那版图集格式。
+
+```json
+{
+  "id": "nw-kunoichi",
+  "displayName": "Kunoichi",
+  "description": "Kunoichi (クノイチ) - agile female ninja android from The Ninja Warriors, sleek crimson armor with dual kunai blades and deadly acrobatic combat.",
+  "spriteVersionNumber": 2,
+  "spritesheetPath": "spritesheet.webp"
+}
+```
+
+精灵图为 `1536x2288` 的无损 WebP，每个 28-40 KB——比一张截图还小。每张是 8 列 11 行的网格，单元格 `192x208`：
+
+| 行 | 轨道 | 帧数 | 逐帧时长 | 含义 |
+|----:|-------|-------:|--------------------|---------------|
+| 0 | idle | 6 | 280, 110, 110, 140, 140, 320 ms | 待机呼吸 |
+| 1 | running-right | 8 | 120 ms，末帧 220 ms | 向右移动 |
+| 2 | running-left | 8 | 120 ms，末帧 220 ms | 向左移动 |
+| 3 | waving | 4 | 140 ms，末帧 280 ms | 打招呼 |
+| 4 | jumping | 5 | 140 ms，末帧 280 ms | 起跳落地 |
+| 5 | failed | 8 | 140 ms，末帧 240 ms | 出错了 |
+| 6 | waiting | 6 | 150 ms，末帧 260 ms | 卡在等你 |
+| 7 | running | 6 | 120 ms，末帧 220 ms | 任务进行中 |
+| 8 | review | 6 | 150 ms，末帧 280 ms | 检视已完成的工作 |
+| 9-10 | look | 8 + 8 | 不计时 | 十六个注视姿态，从正上方起顺时针每 22.5° 一个 |
+
+自己画宠物时需要注意的几点：
+
+- **某一行用不到的单元格永远不会播放。** 里面残留的图案无害；[agent-pet-runtime](https://github.com/dncore/agent-pet-runtime) 的校验器只会给出警告，不会报错。这里四个宠物都有一格这样的残留——第 0 行第 6 列，一个取不到的备用待机帧。
+- **注视行是姿态，不是动画。** Codex 根据指针角度挑一格，所以预览里替你把十六格扫了一遍。
+- **待机用的是原始时长。** Codex 自己的表把这六个时长整体乘以六，把一次呼吸拉得极慢；预览 GIF 用的是原始时长。
+- **挥手、跳跃、失败、检视是一次性的“瞬间”。** 它们把整行播几遍，然后回到待机。等待和两个奔跑行是“状态”，只要状态还在就一直循环。
+
+## 重新生成预览
+
+```sh
+python3 -m pip install pillow numpy
+python3 tools/make_previews.py                      # 生成 previews/<id>.gif
+python3 tools/make_previews.py --scale 3 --background paper
+```
+
+生成脚本读取每个宠物包自己的清单和精灵图，按上表时长播放，并在棋盘格上以 2 倍最近邻放大合成卡片，方便看清透明区域。可用参数：`--pets-dir`、`--out-dir`、`--pets`、`--scale`、`--background {checker,paper,ink}`。
+
+## 致谢
+
+精灵图是为这些宠物手绘的同人作品。《The Ninja Warriors》及其忍者机器人属于 Taito；《Mega Man X4》、X 以及第四装甲与究极装甲属于 Capcom。本项目并非官方作品，未获得两家公司的认可或授权，图案仅供个人非商业使用。
+
+## 许可
+
+脚本与清单文件采用 MIT 许可——见 [LICENSE](LICENSE)。角色设计的权利归其所有者，如上所述。

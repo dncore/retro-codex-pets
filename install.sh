@@ -15,7 +15,7 @@ REPO="dncore/retro-codex-pets"
 RAW="https://raw.githubusercontent.com/$REPO/${PET_REF:-main}"
 CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
 PETS_DIR="$CODEX_DIR/pets"
-KNOWN=(nw-kunoichi nw-ninja x4-fourth-armor x4-ultimate-armor)
+KNOWN=(nw-kunoichi nw-ninja x4-fourth-armor x4-ultimate-armor mega-man-x)
 
 usage() {
   cat <<EOF

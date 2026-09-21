@@ -2,7 +2,7 @@
 
 # Retro Codex Pets
 
-四个像素风的 Codex 宠物，图案取自游戏原版 sprite：两位来自《The Ninja Warriors》的忍者机器人，以及《Mega Man X4》中 X 的两套装甲。每个都是完整的 V2 宠物包——待机、左右奔跑、挥手、跳跃、失败、等待、工作、检视，外加全部十六个注视方向——它会跟着 agent 的进度做反应，而不只是傻站着。
+五个像素风的 Codex 宠物，图案取自游戏原版 sprite：两位来自《The Ninja Warriors》的忍者机器人、《Mega Man X》中的 X 本人，以及《Mega Man X4》中 X 的两套装甲。每个都是完整的 V2 宠物包——待机、左右奔跑、挥手、跳跃、失败、等待、工作、检视，外加全部十六个注视方向——它会跟着 agent 的进度做反应，而不只是傻站着。
 
 下面的预览就是宠物本身，逐帧时长与下方的表格一致。
 
@@ -30,13 +30,19 @@
 
 紫罗兰装甲，金色羽翼头冠，究极冲击。`x4-ultimate-armor` —— 《Mega Man X4》
 
+## Mega Man X
+
+![Mega Man X：待机、向右奔跑、向左奔跑、挥手、跳跃、等待、失败、工作、检视、注视扫描](previews/mega-man-x.gif)
+
+经典蓝色装甲与手炮 X-Buster。`mega-man-x` —— 《Mega Man X》
+
 ## 安装
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/dncore/retro-codex-pets/main/install.sh | bash
 ```
 
-这条命令会把四个宠物全部装进 `$CODEX_HOME/pets`（默认为 `~/.codex/pets`）。然后在 Codex 里打开 **Settings -> Appearance -> Pets** 选中你的宠物，输入 `/pet` 让它出场。
+这条命令会把五个宠物全部装进 `$CODEX_HOME/pets`（默认为 `~/.codex/pets`）。然后在 Codex 里打开 **Settings -> Appearance -> Pets** 选中你的宠物，输入 `/pet` 让它出场。
 
 只装其中几个，或从本地仓库安装：
 
@@ -68,7 +74,7 @@ rm -rf "${CODEX_HOME:-$HOME/.codex}/pets/nw-ninja"
 
 ## 宠物包里有什么
 
-宠物包是以 id 命名的目录，里面有一个 `pet.json` 清单和一张精灵图。这里四个宠物都是 **精灵版本 2**（V2），也就是引入了注视姿态的那版图集格式。
+宠物包是以 id 命名的目录，里面有一个 `pet.json` 清单和一张精灵图。这里五个宠物都是 **精灵版本 2**（V2），也就是引入了注视姿态的那版图集格式。
 
 ```json
 {
@@ -97,7 +103,7 @@ rm -rf "${CODEX_HOME:-$HOME/.codex}/pets/nw-ninja"
 
 自己画宠物时需要注意的几点：
 
-- **第 0 行第 6 列必须有内容，第 7 列必须为空。** V2 的待机行播放第 0~5 列，第 6 列的中立槽必须画（Codex 官方验证器对空白的第 6 列直接报错 `idle row 0 column 6 is empty or too sparse`），第 7 列必须完全透明（否则报 `idle row 0 unused column 7 is not transparent`）。这四个宠物两条都满足，`validate_atlas.py --require-v2` 跑出来 0 error、0 warning。第 6 列是注视装配时用来量取中立的参考槽；指针没有方向时回落到 idle，而不是这一格。
+- **第 0 行第 6 列必须有内容，第 7 列必须为空。** V2 的待机行播放第 0~5 列，第 6 列的中立槽必须画（Codex 官方验证器对空白的第 6 列直接报错 `idle row 0 column 6 is empty or too sparse`），第 7 列必须完全透明（否则报 `idle row 0 unused column 7 is not transparent`）。这五个宠物两条都满足，`validate_atlas.py --require-v2` 跑出来 0 error、0 warning。第 6 列是注视装配时用来量取中立的参考槽；指针没有方向时回落到 idle，而不是这一格。
 - **注视行是姿态，不是动画。** Codex 根据指针角度挑一格，所以预览里替你把十六格扫了一遍。
 - **待机用的是原始时长。** Codex 自己的表把这六个时长整体乘以六，把一次呼吸拉得极慢；预览 GIF 用的是原始时长。
 - **挥手、跳跃、失败、检视是一次性的“瞬间”。** 它们把整行播几遍，然后回到待机。等待和两个奔跑行是“状态”，只要状态还在就一直循环。
@@ -118,7 +124,7 @@ python3 tools/make_previews.py --scale 3 --background paper
 
 [`skills/sprite-to-codex-pet/`](skills/sprite-to-codex-pet/) 就是制作这些宠物所用的 agent skill，与宠物一起开源在这里。把游戏机原版 sprite、MUGEN 图包或你自己的像素画交给它，它会带 agent 走完整个流程：抠背景时不误伤角色自身的配色、从原图切出帧、整数倍最近邻缩放、逐帧解剖学锚定（消除抖动）、判断原图里哪几帧是招手哪几帧是失败、合成原图没有的姿态、最后装配图集。
 
-随附 v2 图集规范、16 条踩坑经验与解决方案，以及四个脚本——图集体检、去底清洗、快速校验、循环预览生成：
+随附 v2 图集规范、24 条踩坑经验与解决方案，以及四个脚本——图集体检、去底清洗、快速校验、循环预览生成：
 
 ```sh
 git clone https://github.com/dncore/retro-codex-pets /tmp/rp
@@ -131,7 +137,7 @@ python3 ~/.claude/skills/sprite-to-codex-pet/scripts/pet_doctor.py path/to/sprit
 
 ## 版权与致谢
 
-本项目的精灵图取自其描绘的游戏原版 sprite：《The Ninja Warriors》（Taito）与《Mega Man X4》（Capcom）。角色、设定、原始 sprite 与名称均归各自所有者所有。本项目不主张任何原创美术，也不主张对上述内容的任何所有权。
+本项目的精灵图取自其描绘的游戏原版 sprite：《The Ninja Warriors》（Taito）、《Mega Man X》与《Mega Man X4》（Capcom）。角色、设定、原始 sprite 与名称均归各自所有者所有。本项目不主张任何原创美术，也不主张对上述内容的任何所有权。
 
 这是一个个人、非商业的同人项目：
 

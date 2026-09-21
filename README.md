@@ -2,7 +2,7 @@ English | [简体中文](README.zh-CN.md)
 
 # Retro Codex Pets
 
-Four pixel-art pets for the Codex CLI, built from the original console sprite art of the games they depict: two androids from *The Ninja Warriors* and two of X's armors from *Mega Man X4*. Every pet is a complete V2 package — idle, running both ways, waving, jumping, failing, waiting, working, reviewing, and all sixteen gaze poses — so it reacts to what the agent is doing instead of just standing there.
+Five pixel-art pets for the Codex CLI, built from the original console sprite art of the games they depict: two androids from *The Ninja Warriors*, X himself from *Mega Man X*, and two of X's armors from *Mega Man X4*. Every pet is a complete V2 package — idle, running both ways, waving, jumping, failing, waiting, working, reviewing, and all sixteen gaze poses — so it reacts to what the agent is doing instead of just standing there.
 
 Each preview below is the real pet, animated with the per-frame timings from the table further down.
 
@@ -30,13 +30,19 @@ White-and-gold armor with the Plasma Buster and hover boots. `x4-fourth-armor` �
 
 Violet armor with the golden wing crest and the Nova Strike. `x4-ultimate-armor` — *Mega Man X4*
 
+## Mega Man X
+
+![Mega Man X: idle, running right, running left, waving, jumping, waiting, failed, working, review, and the gaze sweep](previews/mega-man-x.gif)
+
+Classic blue armor and the X-Buster arm cannon. `mega-man-x` — *Mega Man X*
+
 ## Install
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/dncore/retro-codex-pets/main/install.sh | bash
 ```
 
-That copies all four pets into `$CODEX_HOME/pets` (`~/.codex/pets` by default). Then open Codex, choose your pet under **Settings -> Appearance -> Pets**, and type `/pet` to bring it out.
+That copies all five pets into `$CODEX_HOME/pets` (`~/.codex/pets` by default). Then open Codex, choose your pet under **Settings -> Appearance -> Pets**, and type `/pet` to bring it out.
 
 Install only some of them, or run from a checkout:
 
@@ -97,7 +103,7 @@ The spritesheets are `1536x2288` WebP, losslessly encoded, 28-40 KB each — sma
 
 A few details that matter if you draw your own:
 
-- **Row 0 column 6 is required; column 7 must be empty.** A V2 idle row plays columns 0-5, the neutral slot in column 6 must be populated — Codex's own validator fails an atlas whose column 6 is empty, with `idle row 0 column 6 is empty or too sparse` — and column 7 must be fully transparent, on pain of `idle row 0 unused column 7 is not transparent`. All four pets here satisfy both and pass `validate_atlas.py --require-v2` with no errors and no warnings. Column 6 is the neutral/default slot the gaze assembly measures against; a pointer with no direction falls back to idle rather than to that cell.
+- **Row 0 column 6 is required; column 7 must be empty.** A V2 idle row plays columns 0-5, the neutral slot in column 6 must be populated — Codex's own validator fails an atlas whose column 6 is empty, with `idle row 0 column 6 is empty or too sparse` — and column 7 must be fully transparent, on pain of `idle row 0 unused column 7 is not transparent`. All five pets here satisfy both and pass `validate_atlas.py --require-v2` with no errors and no warnings. Column 6 is the neutral/default slot the gaze assembly measures against; a pointer with no direction falls back to idle rather than to that cell.
 - **The gaze rows are poses, not an animation.** Codex picks one by pointer angle, which is why the preview sweeps through all sixteen for you.
 - **The idle timings are the authored ones.** Codex's own table multiplies those six durations by six and stretches the breath into something very slow; the preview GIFs use the authored timings.
 - **Waving, jumping, failed and review are moments.** They play their row a few times and then settle back into idle. Waiting and the two running rows are conditions, and loop for as long as the condition holds.
@@ -118,7 +124,7 @@ Every preview records the SHA-256 of the atlas it was built from in a GIF commen
 
 [`skills/sprite-to-codex-pet/`](skills/sprite-to-codex-pet/) is the agent skill these pets were built with, published here alongside them. Feed it a sprite sheet from a console game, a MUGEN pack, or your own pixel art, and it walks an agent through the whole job: chroma-keying the background without eating the character's own colours, cutting the frames out of the original art, scaling by whole-number nearest neighbour, anchoring every frame so the pet stops jittering, choosing which original frames are the wave and which are the failure, compositing the poses the original art does not have, and assembling the atlas.
 
-It ships with a spec of the v2 atlas, sixteen documented pitfalls with their fixes, and four scripts — an atlas doctor, a chroma cleaner, a quick checker, and a loop-preview generator:
+It ships with a spec of the v2 atlas, twenty-four documented pitfalls with their fixes, and four scripts — an atlas doctor, a chroma cleaner, a quick checker, and a loop-preview generator:
 
 ```sh
 git clone https://github.com/dncore/retro-codex-pets /tmp/rp
@@ -131,7 +137,7 @@ See the [skill's README](skills/sprite-to-codex-pet/README.md) for what each scr
 
 ## Credits and rights
 
-The sprite art in these pets comes from the original console sprite art of the games they depict: *The Ninja Warriors* (Taito) and *Mega Man X4* (Capcom). The characters, the designs, the original sprites, and the names belong to their owners. No original artwork is claimed here, and no ownership of any of it is asserted.
+The sprite art in these pets comes from the original console sprite art of the games they depict: *The Ninja Warriors* (Taito) and *Mega Man X* and *Mega Man X4* (Capcom). The characters, the designs, the original sprites, and the names belong to their owners. No original artwork is claimed here, and no ownership of any of it is asserted.
 
 This is a personal, non-commercial fan project:
 

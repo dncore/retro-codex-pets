@@ -33,6 +33,18 @@ for pattern in "${patterns[@]}"; do
   fi
 done
 
+# Commit metadata is as public as a file's contents and a file scan cannot see
+# it: the author address is in every clone. Only GitHub noreply addresses are
+# accepted, so a personal address cannot reach the history by accident — add a
+# contributor's address to the pattern below if one ever needs to be allowed.
+addresses="$(git log --format='%ae%n%ce' 2>/dev/null | sort -u | grep -v '^$' || true)"
+stray="$(printf '%s\n' "$addresses" \
+         | grep -vE '^([0-9]+\+)?[A-Za-z0-9._-]+@users\.noreply\.github\.com$' || true)"
+if [ -n "$stray" ]; then
+  printf 'commit address(es) that are not a GitHub noreply address:\n%s\n\n' "$stray"
+  fail=1
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo "sanitize-check: FAILED" >&2
   exit 1

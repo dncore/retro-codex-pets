@@ -8,7 +8,10 @@ jobs:
   sanitize:
     runs-on: ubuntu-latest
     steps:
+      # Full history: the scan covers commit metadata as well as file contents.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Scan for home paths and credentials
         run: bash scripts/sanitize-check.sh
 
